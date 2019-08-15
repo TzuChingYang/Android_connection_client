@@ -161,7 +161,7 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/hr"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.43"
+        app:layout_constraintHorizontal_bias="0.008"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView_Send"
         app:layout_constraintVertical_bias="0.0" />
@@ -178,4 +178,31 @@
         app:layout_constraintEnd_toStartOf="@+id/Button_connect"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/Button_connect" />
+
+    <TextView
+        android:id="@+id/textView_status"
+        android:layout_width="221dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/status"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/button_send"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/button_send"
+        app:layout_constraintTop_toTopOf="@+id/button_send" />
+
+    <Button
+        android:id="@+id/button_disconnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/Button_disconnect"
+        app:layout_constraintBottom_toBottomOf="@+id/Button_connect"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/Button_connect"
+        app:layout_constraintTop_toTopOf="@+id/Button_connect"
+        app:layout_constraintVertical_bias="0.0" />
 </android.support.constraint.ConstraintLayout>

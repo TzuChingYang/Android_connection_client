@@ -21,12 +21,15 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button_auto;
     private Button button_connect  ;
+    private Button button_disconnect ;
     private Button button_send ;
 
     private EditText editText_ip ;
     private EditText editText_port ;
     private EditText editText_messageSend ;
+
     private TextView textView_output ;
+    private TextView textView_status ;
 
     Socket m_Socket ;
     Handler m_Handler ;
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     // Doing Connection of Component and Event listeners)
     public void Initialize(){
         button_connect = findViewById(R.id.Button_connect) ;
+        button_disconnect =findViewById(R.id.button_disconnect) ;
+
         button_send =findViewById(R.id.button_send);
         button_auto=findViewById(R.id.button_auto) ;
 
@@ -56,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         editText_messageSend =findViewById(R.id.EditText_send) ;
 
         textView_output = findViewById(R.id.textView_output) ;
+        textView_status =findViewById(R.id.textView_status) ;
 
 
         m_Handler = new Handler() ;
@@ -66,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     // This function is main to connect the function and the component
     public void set_listeners(){
         button_connect.setOnClickListener(Socket_connect);
+        button_disconnect.setOnClickListener(Socket_disconnect);
+
         button_send.setOnClickListener(Send_Data);
         button_auto.setOnClickListener(Auto_input);
     }
@@ -73,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     /* ================================================= */
     //  Below is many kinds of Runnable Event
     // 1. Basic Button Event
+    //
     /* ================================================= */
 
     // Socket_connection -> This method can start the use of socket
@@ -106,6 +115,29 @@ public class MainActivity extends AppCompatActivity {
             editText_port.setText("9527");
         }
     };
+    private View.OnClickListener Socket_disconnect = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            try{
+                m_Socket.close();
+                Check_Connection();
+
+                m_Handler.removeCallbacks(run_heartbeat);
+
+            }catch(IOException e){
+                textView_output.setText("Socket disconnect error: "+e);
+            }
+        }
+    };
+
+    // Function main to check the socket status -> Show  the status on textView_status
+    private void Check_Connection(){
+        if (m_Socket.isClosed() ==true){
+            textView_status.setText("Unconnected !");
+        }else{
+            textView_status.setText("Connected !");
+        }
+    }
 
     /* ================================================= */
     //  Runnable Event About..
@@ -119,8 +151,11 @@ public class MainActivity extends AppCompatActivity {
             try{
                 m_Socket = new Socket(IP, Integer.parseInt(Port)) ;
 
+                Check_Connection();
+                HeartBeat_start();
                 // Need a thread to catch information
-                //Receive_data();
+
+                Receive_data();
 
             }catch (IOException e){
                 textView_output.setText("Socket connect error: "+e+"\n");
@@ -180,4 +215,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    private void Modify_UI_Status(final String source){
+        m_Handler.post(new Runnable() {
+            @Override
+            public void run() {
+                textView_status.setText(source);
+            }
+        });
+    }
+
+    private void HeartBeat_start(){
+        m_Handler.postDelayed(run_heartbeat,2000) ;
+    }
+
+    private Runnable run_heartbeat = new Runnable() {
+        @Override
+        public void run() {
+            try{
+
+                //Modify_UI("beat..");
+                m_Socket.sendUrgentData(0xff);
+                m_Handler.postDelayed(this,2000) ;
+
+            }catch(IOException e){
+                Modify_UI("Heart broken");
+                Modify_UI_Status("Unconnected !");
+                m_Handler.removeCallbacks(run_heartbeat);
+
+            }
+        }
+    };
 }
